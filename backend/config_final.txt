@@ -1,0 +1,29 @@
+backend/
+├── app/
+│   ├── __init__.py
+│   ├── main.py              # Ponto de entrada FastAPI com CORS
+│   ├── core/
+│   │   ├── __init__.py
+│   │   ├── config.py        # Configurações e variáveis de ambiente
+│   │   └── security.py      # Funções de hash (bcrypt) e JWT
+│   ├── database/
+│   │   ├── __init__.py
+│   │   └── session.py       # Engine do SQLAlchemy e get_db()
+│   ├── models/              # Modelos das tabelas do banco
+│   │   ├── __init__.py
+│   │   ├── user.py
+│   │   ├── alert.py
+│   │   └── stock.py
+│   ├── schemas/             # Schemas Pydantic (validação de entrada/saída)
+│   │   ├── __init__.py
+│   │   ├── user.py
+│   │   ├── alert.py
+│   │   └── stock.py
+│   └── routes/              # Endpoints da API
+│       ├── __init__.py
+│       ├── auth.py
+│       ├── alerts.py
+│       └── stocks.py
+├── .env.example
+├── requirements.txt
+└── README.md
