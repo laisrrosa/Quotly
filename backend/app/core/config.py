@@ -18,5 +18,5 @@ class Settings(BaseSettings):
         case_sensitive=True
     )
 
-#instancia da classe para que todo projeto importe 'settings' pronto
+#instancia da classe para que todo projeto importe 'settings' já pronto
 settings = Settings()
