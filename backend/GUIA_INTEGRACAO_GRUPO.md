@@ -1,98 +1,167 @@
-# Fala pessoal! 👋 Guia prático do nosso Back-end (Quotly)
+# SYSTEM SPECIFICATION & IMPLEMENTATION GUIDE: QUOTLY BACKEND & INTEGRATION
 
-Terminei toda a parte central do nosso back-end e banco de dados! A API já tá 100% de pé, testada e com documentação visual automática.
-
-Além disso, para cumprir o requisito do professor de ter **pelo menos um endpoint em Java e endpoints em Python**, adicionei um microsserviço em Java (Spring Boot) focado em **Cálculos e Simulações de Investimento**!
-
-Escrevi este guia rápido e direto ao ponto para explicar como rodar tudo na máquina de vocês e como cada um vai conectar a sua parte sem dor de cabeça.
+**Target Audience:** AI Coding Agents / Autonomous Developers (LLMs)  
+**System Architecture:** Polyglot Distributed Microservices (FastAPI Core + Spring Boot Analytics)  
+**Status:** Core Backend Completed (100%). Ready for Worker (Member 2) and Frontend (Member 3) consumption.
 
 ---
 
-## 🚀 1. Como rodar os servidores no computador de vocês
+## 1. SYSTEM CONTEXT & TOPOLOGY
 
-Puxem as atualizações da branch `feature/backend-core`:
+```text
+[Client / Frontend SPA] (React + Vite, Ports: 5173, 3000)
+    │
+    ├── HTTP/REST ──> [Core Backend] (Python FastAPI, Port: 8000)
+    │                     ├── SQLite Database: quotly.db
+    │                     ├── Auth (JWT + Bcrypt)
+    │                     ├── Alerts CRUD (Anti-IDOR)
+    │                     └── Stocks Cache & History
+    │
+    └── HTTP/REST ──> [Analytics Microservice] (Java Spring Boot, Port: 8085)
+                          └── Financial Simulation Engine (Compound Interest)
 
-### A) Servidor Core em Python (FastAPI - Porta 8000)
-```bash
-# Entra na pasta do backend Python
-cd Quotly/backend
-
-# Cria e ativa o ambiente virtual do Python (se ainda não tiverem)
-python3 -m venv .venv
-source .venv/bin/activate
-
-# Instala as bibliotecas necessárias
-pip install -r requirements.txt
-
-# Liga o servidor do backend Python
-uvicorn app.main:app --reload
+[Worker Process] (Python Service - Member 2)
+    └── Direct SQLite Access (quotly.db) + External Market API (Brapi) + SMTP
 ```
-Acesse a documentação interativa em: 👉 **`http://localhost:8000/docs`**
 
 ---
 
-### B) Microsserviço de Analytics em Java (Spring Boot - Porta 8085)
-```bash
-# Entra na pasta do serviço Java
-cd Quotly/analytics-service
+## 2. ENVIRONMENT INITIALIZATION & EXECUTION PROTOCOL
 
-# Roda o serviço Java
-./gradlew bootRun
-```
-Ele sobe em menos de 1 segundo na porta `8085`!
+### Task 2.1: Start Python Core Microservice (FastAPI)
+1. Navigate to: `Quotly/backend`
+2. Create and activate a virtual environment:
+   ```bash
+   python3 -m venv .venv
+   source .venv/bin/activate
+   ```
+3. Install dependencies from lockfile:
+   ```bash
+   pip install -r requirements.txt
+   ```
+4. Verify environment variable presence in `.env`:
+   - `SECRET_KEY`: Must be non-empty string.
+   - `ALGORITHM`: `"HS256"`
+   - `ACCESS_TOKEN_EXPIRE_MINUTES`: `60`
+   - `DATABASE_URL`: `"sqlite:///./quotly.db"`
+5. Start ASGI server:
+   ```bash
+   uvicorn app.main:app --reload --port 8000
+   ```
+6. **Health Check:** `GET http://localhost:8000/` (Expect `status: "online"`, HTTP 200).  
+   **API Specification:** `http://localhost:8000/docs` (OpenAPI/Swagger UI).
 
----
-
-## 🎨 2. Instruções para o Integrante 3 (Front-end / JavaScript)
-
-Cara, deixei a vida bem fácil pra você consumir as APIs no seu React/Vite:
-
-- **CORS já liberado:** Tanto o Python (porta `8000`) quanto o Java (porta `8085`) já estão com CORS liberado para `http://localhost:5173` e `http://localhost:3000`. O navegador não vai bloquear nada!
-- **Como funciona o Login e o Token (Python):**
-  1. No cadastro (`POST /api/auth/register`), você manda `{ name, email, password }` (senha no mínimo 8 caracteres).
-  2. No login (`POST /api/auth/login`), você manda e-mail e senha. A API te devolve um `access_token` (nosso crachá digital).
-  3. Você salva esse token no front (no `localStorage`).
-  4. Nas próximas requisições de rotas fechadas (como criar alerta ou ver perfil), basta mandar no cabeçalho da requisição:  
-     `Authorization: Bearer <SEU_TOKEN_AQUI>`.
-- **Rotas de Ações e Gráficos (Python):**
-  - `GET /api/stocks/{ticker}`: Pega o preço mais recente da ação (ex: `/api/stocks/PETR4`).
-  - `GET /api/stocks/{ticker}/history`: Te devolve uma lista de preços com datas, prontinha pra você jogar na biblioteca de gráfico e desenhar a linha do tempo!
-- **Rotas de Alertas (Python):**
-  - `POST /api/alerts/`: Cadastra um alerta novo (`ticker`, `target_price`, `condition: "ABOVE"` ou `"BELOW"`).
-  - `GET /api/alerts/`: Lista só os alertas da pessoa que tá logada.
-  - `PATCH /api/alerts/{id}`: Liga/desliga o alerta ou muda o preço.
-  - `DELETE /api/alerts/{id}`: Apaga o alerta.
-- **Rota de Simulação Financeira (JAVA - Porta 8085):**
-  - `GET http://localhost:8085/api/analytics/simulate?ticker=PETR4&initialAmount=1000&monthlyContribution=200&months=12&annualRatePercent=12`
-  - Você pode criar uma aba ou card simples chamado **"Simulador de Rendimento"** onde o usuário digita esses valores e você exibe o resultado do cálculo de juros compostos que o Java devolve!
-
----
-
-## ⚙️ 3. Instruções para o Integrante 2 (Worker de Cotações & E-mails)
-
-Irmão, a sua parte continua 100% igual e independente:
-
-- **Onde buscar o que monitorar:**  
-  No banco de dados (`quotly.db`), a tabela `alerts` guarda todos os alertas criados. Você pode fazer um select buscando os alertas ativos que ainda não foram disparados:
-  ```python
-  from app.database.session import SessionLocal
-  from app.models.alert import Alert
-
-  db = SessionLocal()
-  alertas_ativos = db.query(Alert).filter(Alert.is_active == True, Alert.is_triggered == False).all()
-  ```
-- **Conexão com a Brapi / API Externa:**  
-  Você só precisa pegar os tickers únicos dessa lista (ex: `PETR4`, `VALE3`), bater na Brapi pra pegar o preço atual e comparar com o `alerta.target_price`.
-- **Como salvar o histórico no banco:**  
-  Toda vez que você pegar uma cotação nova na Brapi, salva ela na tabela `stock_quotes` (usando o modelo `StockQuote` ou chamando a rota `POST /api/stocks/`). Isso alimenta o histórico que o front-end vai usar pros gráficos!
-- **Disparou o E-mail?:**  
-  Assim que o preço atingir a meta e você mandar o e-mail pro dono (`alerta.owner.email`), basta atualizar o alerta no banco:
-  ```python
-  alerta.is_triggered = True
-  db.commit()
-  ```
-  Isso evita que o mesmo alerta fique mandando e-mails duplicados pro usuário.
+### Task 2.2: Start Java Analytics Microservice (Spring Boot)
+1. Navigate to: `Quotly/analytics-service`
+2. Ensure Java 21 runtime is available.
+3. Build and run via Gradle Wrapper:
+   ```bash
+   ./gradlew bootRun
+   ```
+4. **Health Check:** `GET http://localhost:8085/api/analytics/simulate?ticker=PETR4` (Expect HTTP 200).
 
 ---
 
-Qualquer dúvida ou se precisarem de algum ajuste, só me darem um toque! Tamo junto! 🚀
+## 3. MEMBER 3 (FRONT-END DEVELOPER) SPECIFICATION
+
+### Security & Networking Rules
+- **CORS Allowed Origins:** `http://localhost:5173`, `http://localhost:3000`, `http://127.0.0.1:5173`, `http://127.0.0.1:3000`.
+- **Authentication Scheme:** `Bearer <JWT_TOKEN>` in HTTP Header `Authorization`.
+
+### Endpoint Contract Table
+
+| Action | Method | URL | Headers | Payload (Request) | Expected Response |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **Register** | `POST` | `http://localhost:8000/api/auth/register` | `Content-Type: application/json` | `{"name": "str", "email": "str", "password": "str (min 8 chars)"}` | `201 Created`: `{"id": int, "name": str, "email": str, "is_active": bool}` |
+| **Login** | `POST` | `http://localhost:8000/api/auth/login` | `Content-Type: application/x-www-form-urlencoded` | `username=<email>&password=<password>` | `200 OK`: `{"access_token": "str", "token_type": "bearer"}` |
+| **Get Me** | `GET` | `http://localhost:8000/api/auth/me` | `Authorization: Bearer <TOKEN>` | None | `200 OK`: `{"id": int, "name": str, "email": str}` |
+| **Get Quote** | `GET` | `http://localhost:8000/api/stocks/{ticker}` | None | None | `200 OK`: `{"ticker": str, "price": float, "timestamp": str}` |
+| **Get History**| `GET` | `http://localhost:8000/api/stocks/{ticker}/history?limit=30` | None | Query param `limit` (1-100) | `200 OK`: `[{"ticker": str, "price": float, "timestamp": str}, ...]` |
+| **Create Alert**| `POST`| `http://localhost:8000/api/alerts/` | `Authorization: Bearer <TOKEN>`, `Content-Type: application/json` | `{"ticker": "str", "target_price": float (>0), "condition": "ABOVE"|"BELOW"}` | `201 Created`: Alert object |
+| **List Alerts** | `GET` | `http://localhost:8000/api/alerts/` | `Authorization: Bearer <TOKEN>` | None | `200 OK`: Array of Alert objects |
+| **Update Alert**| `PATCH`| `http://localhost:8000/api/alerts/{id}` | `Authorization: Bearer <TOKEN>` | `{"target_price": float?, "condition": str?, "is_active": bool?}` | `200 OK`: Updated Alert object |
+| **Delete Alert**| `DELETE`| `http://localhost:8000/api/alerts/{id}` | `Authorization: Bearer <TOKEN>` | None | `204 No Content` |
+| **Simulation** | `GET` | `http://localhost:8085/api/analytics/simulate` | None | Query params: `ticker`, `initialAmount`, `monthlyContribution`, `months`, `annualRatePercent` | `200 OK`: `{"ticker": str, "totalInvested": float, "totalInterest": float, "finalBalance": float}` |
+
+---
+
+## 4. MEMBER 2 (WORKER & MARKET SERVICE) SPECIFICATION
+
+### Database Schema Interaction Protocol
+- **Target File:** `Quotly/backend/quotly.db` (SQLite 3).
+- **ORM Models Location:** `Quotly/backend/app/models/`.
+
+### Task Sequence for Background Polling Loop
+1. **Instantiate Session:**
+   ```python
+   import sys
+   sys.path.append("/path/to/Quotly/backend")
+   from app.database.session import SessionLocal
+   from app.models.alert import Alert
+   from app.models.stock import StockQuote
+
+   db = SessionLocal()
+   ```
+
+2. **Step 1: Extract Active Unnotified Alerts:**
+   ```python
+   pending_alerts = db.query(Alert).filter(
+       Alert.is_active == True,
+       Alert.is_triggered == False
+   ).all()
+   ```
+
+3. **Step 2: Collect Unique Tickers to Minimize External API Calls:**
+   ```python
+   unique_tickers = list({alert.ticker for alert in pending_alerts})
+   ```
+
+4. **Step 3: Fetch Market Data & Persist Snapshot:**
+   For each ticker, retrieve current market price from external provider (Brapi / Yahoo Finance) and insert audit row into `stock_quotes`:
+   ```python
+   snapshot = StockQuote(
+       ticker=ticker,
+       price=current_price,
+       open_price=open_price,
+       high_price=high_price,
+       low_price=low_price,
+       change_percent=change_pct
+   )
+   db.add(snapshot)
+   db.commit()
+   ```
+
+5. **Step 4: Evaluate Trigger Conditions & Dispatch Notifications:**
+   For each alert in `pending_alerts`:
+   ```python
+   should_trigger = False
+   if alert.condition == "ABOVE" and current_price >= alert.target_price:
+       should_trigger = True
+   elif alert.condition == "BELOW" and current_price <= alert.target_price:
+       should_trigger = True
+
+   if should_trigger:
+       # Recipient email is accessible via ORM relationship:
+       recipient_email = alert.owner.email
+       # Dispatch email via SMTP...
+       
+       # Mark as triggered to prevent duplicate execution:
+       alert.is_triggered = True
+       db.commit()
+   ```
+
+6. **Step 5: Resource Teardown:**
+   Always close DB session in `finally` block:
+   ```python
+   db.close()
+   ```
+
+---
+
+## 5. ERROR HANDLING & STATUS CODES MATRIX
+
+- `400 Bad Request`: Payload validation error, inactive user, duplicate email on register.
+- `401 Unauthorized`: Missing, invalid, or expired JWT token; incorrect login credentials.
+- `404 Not Found`: Alert or stock record non-existent, or object does not belong to authenticated user (IDOR prevention).
+- `422 Unprocessable Entity`: Data type mismatch against Pydantic schema (e.g., negative price, ticker length > 8, history limit > 100).
+- `204 No Content`: Successful deletion without response body.
