@@ -1,0 +1,7 @@
+Diário de atualização Integrante 1 - Backend:
+
+14/10/2026:
+1º commit: inicializar pastas e arquivos a serem utilizados como backende e .gitignore
+
+2º commit: construção das pastas e arquivos do backend e escrita das
+Configurações "config.py" para validação de acesso, versionamento...
