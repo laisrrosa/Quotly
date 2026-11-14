@@ -1,0 +1,11 @@
+# Dependências extras do módulo do Integrante 2 (cotações, e-mail e worker).
+# Instalar junto com as do back-end:
+#   python -m pip install -r requirements.txt -r requirements-worker.txt
+httpx>=0.27
+yfinance>=1.0
+APScheduler>=3.10,<4
+python-dotenv>=1.0
+tzdata>=2024.1
+
+# testes
+pytest>=8.0
