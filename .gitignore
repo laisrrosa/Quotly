@@ -1,6 +1,19 @@
+# Python
+.venv/
 venv/
 __pycache__/
 *.pyc
 .env
 *.db
 *.sqlite3
+
+# Java / Gradle / Maven
+build/
+.gradle/
+target/
+*.jar
+*.war
+
+# Node / Frontend
+node_modules/
+dist/
