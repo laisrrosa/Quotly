@@ -12,6 +12,7 @@ build/
 .gradle/
 target/
 *.jar
+!gradle-wrapper.jar
 *.war
 
 # Node / Frontend
