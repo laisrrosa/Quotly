@@ -8,16 +8,18 @@ import {
   YAxis,
 } from 'recharts'
 import { RANGES } from '../services/quotes.js'
-import { formatDate, formatMoney } from '../utils/format.js'
+import { formatDate, formatDateTime, formatMoney, formatTime } from '../utils/format.js'
 import { Skeleton } from './Spinner.jsx'
 
-function ChartTooltip({ active, payload, currency }) {
+function ChartTooltip({ active, payload, currency, showTime }) {
   if (!active || !payload?.length) return null
   const { date, close } = payload[0].payload
   return (
     <div className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm shadow-md">
       <p className="text-xs text-slate-500">
-        {formatDate(date, { day: '2-digit', month: 'short', year: 'numeric' })}
+        {showTime
+          ? formatDateTime(date)
+          : formatDate(date, { day: '2-digit', month: 'short', year: 'numeric' })}
       </p>
       <p className="font-mono font-semibold">{formatMoney(close, currency)}</p>
     </div>
@@ -28,6 +30,13 @@ export default function PriceChart({ data, range, onRangeChange, loading, curren
   const up = data.length > 1 && data[data.length - 1].close >= data[0].close
   const color = up ? 'var(--color-up)' : 'var(--color-down)'
   const longRange = range === '6mo' || range === '1y'
+
+  // A API real devolve um ponto por coleta do worker (com hora), não um por pregão.
+  // Se todos os pontos couberem em menos de 2 dias, o eixo mostra a hora.
+  const hasTime = data.length > 0 && data[0].date.length > 10
+  const spanMs =
+    hasTime && data.length > 1 ? new Date(data[data.length - 1].date) - new Date(data[0].date) : 0
+  const intraday = hasTime && spanMs < 2 * 24 * 60 * 60 * 1000
 
   return (
     <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
@@ -65,7 +74,9 @@ export default function PriceChart({ data, range, onRangeChange, loading, curren
               <XAxis
                 dataKey="date"
                 tickFormatter={(d) =>
-                  formatDate(d, longRange ? { month: 'short', year: '2-digit' } : undefined)
+                  intraday
+                    ? formatTime(d)
+                    : formatDate(d, longRange ? { month: 'short', year: '2-digit' } : undefined)
                 }
                 tick={{ fontSize: 12, fill: '#64748b' }}
                 tickLine={false}
@@ -80,7 +91,7 @@ export default function PriceChart({ data, range, onRangeChange, loading, curren
                 axisLine={false}
                 width={56}
               />
-              <Tooltip content={<ChartTooltip currency={currency} />} />
+              <Tooltip content={<ChartTooltip currency={currency} showTime={hasTime} />} />
               <Area
                 type="monotone"
                 dataKey="close"

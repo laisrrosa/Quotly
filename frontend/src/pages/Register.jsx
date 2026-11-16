@@ -13,7 +13,7 @@ function validate({ name, email, password, confirm }) {
   const errors = {}
   if (name.trim().length < 2) errors.name = 'Informe seu nome.'
   if (!EMAIL_REGEX.test(email)) errors.email = 'Informe um e-mail válido.'
-  if (password.length < 6) errors.password = 'A senha precisa ter pelo menos 6 caracteres.'
+  if (password.length < 8) errors.password = 'A senha precisa ter pelo menos 8 caracteres.'
   if (confirm !== password) errors.confirm = 'As senhas não coincidem.'
   return errors
 }

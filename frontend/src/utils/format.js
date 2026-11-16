@@ -23,6 +23,11 @@ export function formatDate(iso, opts = { day: '2-digit', month: 'short' }) {
   return d.toLocaleDateString('pt-BR', opts)
 }
 
+export function formatTime(iso) {
+  if (!iso) return '—'
+  return new Date(iso).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+}
+
 export function formatDateTime(iso) {
   if (!iso) return '—'
   return new Date(iso).toLocaleString('pt-BR', {

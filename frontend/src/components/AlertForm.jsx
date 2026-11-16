@@ -3,7 +3,8 @@ import Button from './Button.jsx'
 import FormField from './FormField.jsx'
 import { CONDITION_LABELS } from '../services/alerts.js'
 
-const TICKER_REGEX = /^[A-Z0-9.]{2,10}$/
+// A API aceita tickers de 4 a 8 caracteres
+const TICKER_REGEX = /^[A-Z0-9.]{4,8}$/
 
 function validate({ ticker, targetPrice, condition }) {
   const errors = {}
@@ -20,8 +21,16 @@ function validate({ ticker, targetPrice, condition }) {
  * Formulário usado tanto para criar quanto para editar alertas.
  * - initial: valores iniciais (ticker pré-preenchido ou alerta existente)
  * - currentPrice: opcional, só para mostrar como referência
+ * - lockTicker: trava o campo da ação (a API não permite trocar o ticker de um alerta)
  */
-export default function AlertForm({ initial = {}, currentPrice, onSubmit, onCancel, submitLabel }) {
+export default function AlertForm({
+  initial = {},
+  currentPrice,
+  onSubmit,
+  onCancel,
+  submitLabel,
+  lockTicker = false,
+}) {
   const [values, setValues] = useState({
     ticker: initial.ticker ?? '',
     targetPrice: initial.targetPrice ?? '',
@@ -63,6 +72,7 @@ export default function AlertForm({ initial = {}, currentPrice, onSubmit, onCanc
         onChange={(e) => update('ticker', e.target.value.toUpperCase().trim())}
         error={errors.ticker}
         autoComplete="off"
+        disabled={lockTicker}
       />
 
       <fieldset>
