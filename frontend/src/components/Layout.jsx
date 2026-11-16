@@ -36,6 +36,9 @@ export default function Layout() {
               <NavLink to="/alerts" className={linkClass}>
                 Meus alertas
               </NavLink>
+              <NavLink to="/analytics" className={linkClass}>
+                Análises
+              </NavLink>
             </nav>
           </div>
           <div className="flex items-center gap-3">

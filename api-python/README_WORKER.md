@@ -1,6 +1,6 @@
 # Quotly: cotações, worker de alertas e e-mails (Integrante 2)
 
-Este módulo roda **dentro do back-end** (`backend/`) e usa os mesmos modelos e
+Este módulo roda **dentro do back-end** (`api-python/`) e usa os mesmos modelos e
 o mesmo banco (`quotly.db`) do Integrante 1.
 
 | Pasta / arquivo | O que faz |
@@ -16,7 +16,7 @@ o mesmo banco (`quotly.db`) do Integrante 1.
 | `requirements-worker.txt` | dependências extras do módulo |
 | `.env.worker.example` | variáveis do módulo (copiar para `.env.worker`) |
 
-## Instalação (dentro de `backend/`)
+## Instalação (dentro de `api-python/`)
 
 ```powershell
 python -m venv .venv
@@ -55,7 +55,7 @@ coluna, o worker passa a preenchê-la sozinho.
 
 ### Rodar o worker
 
-Em outro terminal, dentro de `backend/`, com a API ligada ou não:
+Em outro terminal, dentro de `api-python/`, com a API ligada ou não:
 
 ```powershell
 python -m app.workers          # roda sempre, a cada 5 minutos
@@ -72,11 +72,10 @@ e as rotas existentes `GET /api/stocks/{ticker}` e `/history` passam a devolver
 esses dados.
 
 Para consultar **qualquer** ação direto nas APIs de mercado, há um roteador
-opcional pronto em `app/routes/quotes.py` (`GET /api/quotes/{ticker}` e
+em `app/routes/quotes.py` (`GET /api/quotes/{ticker}` e
 `/api/quotes/{ticker}/history?range=7d|1mo|6mo|1y`, no formato do
-`API_CONTRACT.md` do front-end). Ele fica desligado até o responsável pelo
-back-end decidir incluí-lo no `app/main.py`; as instruções estão no topo do
-arquivo.
+`API_CONTRACT.md` do front-end). Ele já está ligado no `app/main.py` e é a rota que o front-end usa na tela
+de cotações.
 
 ## Testes manuais
 
@@ -100,8 +99,9 @@ o histórico gratuito dela é curto, então períodos longos caem no yfinance.
 
 - O contrato do front (`API_CONTRACT.md`) e o back-end atual divergem: login
   em JSON × `form-urlencoded`, `status` × `is_triggered/is_active`, `camelCase`
-  × `snake_case`, `/api/quotes` × `/api/stocks`. O worker funciona com o
-  back-end como está hoje.
+  × `snake_case`. O front-end faz a conversão em
+  `frontend/src/services/adapters.js`; o worker funciona com o back-end como
+  está hoje.
 - `/api/stocks/{ticker}` devolve o último registro de `stock_quotes`, que só é
-  preenchido para tickers com alerta ativo. Para o front consultar qualquer
-  ação, o ideal é usar `/api/quotes/{ticker}`.
+  preenchido para tickers com alerta ativo. Por isso o front consulta as
+  cotações por `/api/quotes/{ticker}`.

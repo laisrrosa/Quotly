@@ -142,7 +142,17 @@ export default function Dashboard() {
         <>
           <QuoteCard
             quote={quote}
-            action={<Button onClick={() => setAlertOpen(true)}>🔔 Criar alerta</Button>}
+            action={
+              <div className="flex flex-wrap gap-2">
+                <Link
+                  to={`/analytics?ticker=${encodeURIComponent(quote.ticker)}`}
+                  className="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
+                >
+                  📊 Analisar
+                </Link>
+                <Button onClick={() => setAlertOpen(true)}>🔔 Criar alerta</Button>
+              </div>
+            }
           />
           <PriceChart
             data={history}

@@ -1,4 +1,4 @@
-import { formatDateTime, formatMoney, formatPercent } from '../utils/format.js'
+import { formatCompact, formatDateTime, formatMoney, formatPercent } from '../utils/format.js'
 import { Skeleton } from './Spinner.jsx'
 
 function Stat({ label, value }) {
@@ -11,7 +11,7 @@ function Stat({ label, value }) {
 }
 
 export default function QuoteCard({ quote, action }) {
-  // a API real pode não informar a variação (change fica null)
+  // se a variação não vier, o selo de alta/baixa não aparece
   const hasChange = quote.change != null
   const up = !hasChange || quote.change >= 0
   const color = up ? 'text-up bg-up/10' : 'text-down bg-down/10'
@@ -45,9 +45,9 @@ export default function QuoteCard({ quote, action }) {
 
       <dl className="mt-6 grid grid-cols-2 gap-4 border-t border-slate-100 pt-4 sm:grid-cols-4">
         <Stat label="Fech. anterior" value={formatMoney(quote.previousClose, quote.currency)} />
-        <Stat label="Abertura" value={formatMoney(quote.open, quote.currency)} />
         <Stat label="Máxima do dia" value={formatMoney(quote.high, quote.currency)} />
         <Stat label="Mínima do dia" value={formatMoney(quote.low, quote.currency)} />
+        <Stat label="Volume" value={formatCompact(quote.volume)} />
       </dl>
 
       <p className="mt-4 text-xs text-slate-400">Atualizado em {formatDateTime(quote.updatedAt)}</p>

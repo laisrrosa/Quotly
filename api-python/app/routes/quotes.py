@@ -7,7 +7,7 @@ Buscam em APIs externas (brapi / Yahoo Finance) pelo serviço do Integrante 2.
 Exigem login (JWT). São rotas `def` (não `async def`) de propósito: as
 chamadas de rede são síncronas e assim rodam no threadpool do FastAPI.
 
-Para ativar, em app/main.py:
+Ativadas em app/main.py com:
 
     from app.routes.quotes import router as quotes_router
     app.include_router(quotes_router)

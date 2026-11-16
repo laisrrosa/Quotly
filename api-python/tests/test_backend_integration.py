@@ -1,6 +1,6 @@
 """Integração com o back-end real (modelos, sessão e rotas do Integrante 1).
 
-Ignorado automaticamente se este módulo for usado fora da pasta `backend/`.
+Ignorado automaticamente se este módulo for usado fora da pasta `api-python/`.
 """
 import pytest
 
