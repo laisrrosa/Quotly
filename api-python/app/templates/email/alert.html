@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Alerta de preço: $ticker</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f1f5f9;font-family:Arial,Helvetica,sans-serif;color:#0f172a;">
+  <div style="display:none;max-height:0;overflow:hidden;">$ticker $condition_text $target_price. Preço atual: $current_price.</div>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f1f5f9;padding:24px 12px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background-color:#ffffff;border-radius:12px;overflow:hidden;">
+          <tr>
+            <td style="background-color:#0f172a;padding:20px 28px;">
+              <span style="font-size:22px;font-weight:bold;color:#ffffff;letter-spacing:0.5px;">Quotly</span>
+              <span style="font-size:13px;color:#94a3b8;padding-left:8px;">alerta de preço</span>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:28px 28px 8px 28px;">
+              <p style="margin:0 0 12px 0;font-size:16px;">Olá, <strong>$user_name</strong>!</p>
+              <p style="margin:0 0 20px 0;font-size:16px;line-height:1.5;">
+                Seu alerta foi atingido: <strong>$ticker</strong> $condition_text <strong>$target_price</strong>.
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:0 28px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:$accent_bg;border-radius:10px;">
+                <tr>
+                  <td style="padding:18px 20px;">
+                    <div style="font-size:13px;color:#475569;">Preço atual de $ticker</div>
+                    <div style="font-size:32px;font-weight:bold;color:$accent_color;padding-top:4px;">$arrow $current_price</div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:20px 28px 4px 28px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;">
+                <tr>
+                  <td style="padding:8px 0;color:#64748b;border-bottom:1px solid #e2e8f0;">Ativo</td>
+                  <td align="right" style="padding:8px 0;border-bottom:1px solid #e2e8f0;"><strong>$ticker</strong></td>
+                </tr>
+                <tr>
+                  <td style="padding:8px 0;color:#64748b;border-bottom:1px solid #e2e8f0;">Condição</td>
+                  <td align="right" style="padding:8px 0;border-bottom:1px solid #e2e8f0;">$condition_label $target_price</td>
+                </tr>
+                <tr>
+                  <td style="padding:8px 0;color:#64748b;border-bottom:1px solid #e2e8f0;">Preço no disparo</td>
+                  <td align="right" style="padding:8px 0;border-bottom:1px solid #e2e8f0;">$current_price</td>
+                </tr>
+                <tr>
+                  <td style="padding:8px 0;color:#64748b;">Data/hora</td>
+                  <td align="right" style="padding:8px 0;">$triggered_at</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td align="center" style="padding:24px 28px 8px 28px;">
+              <a href="$alerts_url" style="display:inline-block;background-color:#2563eb;color:#ffffff;text-decoration:none;font-size:15px;font-weight:bold;padding:12px 28px;border-radius:8px;">Abrir o Quotly</a>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:16px 28px 28px 28px;">
+              <p style="margin:0;font-size:13px;line-height:1.5;color:#64748b;">
+                Este alerta foi marcado como <strong>disparado</strong> e não enviará novos e-mails.
+                Para voltar a monitorar este preço, reative-o em &ldquo;Meus Alertas&rdquo;.
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="background-color:#f8fafc;padding:16px 28px;font-size:12px;line-height:1.5;color:#94a3b8;">
+              Você recebeu este e-mail porque criou um alerta de preço no Quotly.<br>
+              Este e-mail é informativo e não constitui recomendação de investimento.
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

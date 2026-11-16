@@ -1,0 +1,22 @@
+Olá, $user_name!
+
+Seu alerta de preço no Quotly foi atingido.
+
+$ticker $condition_text $target_price
+Preço atual: $current_price
+
+Detalhes do alerta
+- Ativo: $ticker
+- Condição: $condition_label $target_price
+- Preço no momento do disparo: $current_price
+- Data/hora: $triggered_at
+
+Acesse o Quotly para ver o gráfico e gerenciar seus alertas:
+$alerts_url
+
+Este alerta foi marcado como "disparado" e não enviará novos e-mails.
+Para voltar a monitorar este preço, reative-o em "Meus Alertas".
+
+--
+Quotly - consulta de cotações e alertas de preço
+Este e-mail é informativo e não constitui recomendação de investimento.
