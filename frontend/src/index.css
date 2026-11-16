@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  --color-up: #16a34a;
+  --color-down: #dc2626;
+  --color-brand: #4f46e5;
+  --color-brand-dark: #4338ca;
+}
+
+body {
+  @apply bg-slate-50 text-slate-900 antialiased;
+}
