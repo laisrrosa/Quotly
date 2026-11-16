@@ -7,6 +7,7 @@ import Modal from '../components/Modal.jsx'
 import PriceChart from '../components/PriceChart.jsx'
 import QuoteCard, { QuoteCardSkeleton } from '../components/QuoteCard.jsx'
 import TickerSearch from '../components/TickerSearch.jsx'
+import { MAX_SAVED, useSavedTickers } from '../hooks/useSavedTickers.js'
 import { createAlert } from '../services/alerts.js'
 import { getErrorMessage } from '../services/api.js'
 import { getHistory, getQuote, POPULAR_TICKERS } from '../services/quotes.js'
@@ -31,6 +32,8 @@ export default function Dashboard() {
   const [historyLoading, setHistoryLoading] = useState(false)
 
   const [alertOpen, setAlertOpen] = useState(false)
+
+  const { add: addSaved, remove: removeSaved, isSaved } = useSavedTickers()
 
   // Busca a cotação sempre que o ticker da URL mudar
   useEffect(() => {
@@ -96,6 +99,24 @@ export default function Dashboard() {
     setSearchParams({ ticker: t })
   }
 
+  // Botão "Salvar" do card: põe ou tira o ativo da lista de tickers salvos
+  function toggleSaved(t) {
+    if (isSaved(t)) {
+      removeSaved(t)
+      toast.success(`${t} removido dos salvos.`)
+      return
+    }
+    if (addSaved(t) === 'full') {
+      toast.error(`Você pode salvar no máximo ${MAX_SAVED} tickers.`)
+      return
+    }
+    toast.success(
+      <span>
+        {t} salvo! <Link to="/saved" className="font-medium underline">Ver salvos</Link>
+      </span>,
+    )
+  }
+
   async function handleCreateAlert(payload) {
     try {
       await createAlert(payload)
@@ -155,6 +176,13 @@ export default function Dashboard() {
             autoRefresh
             action={
               <div className="flex flex-wrap gap-2">
+                <Button
+                  variant="secondary"
+                  aria-pressed={isSaved(quote.ticker)}
+                  onClick={() => toggleSaved(quote.ticker)}
+                >
+                  {isSaved(quote.ticker) ? '★ Salvo' : '☆ Salvar'}
+                </Button>
                 <Link
                   to={`/analytics?ticker=${encodeURIComponent(quote.ticker)}`}
                   className="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"

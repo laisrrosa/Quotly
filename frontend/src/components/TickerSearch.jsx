@@ -6,10 +6,18 @@ import Button from './Button.jsx'
  * Campo de busca de ação com sugestões (autocomplete).
  * - value / onChange: texto digitado (controlado pela página)
  * - onSearch(ticker): chamado ao enviar o formulário ou escolher uma sugestão
+ * - submitLabel: texto do botão (padrão "Buscar")
+ * - loading: mostra o botão carregando
  *
  * Teclado: ↓ e ↑ percorrem as sugestões, Enter escolhe, Esc fecha a lista.
  */
-export default function TickerSearch({ value, onChange, onSearch }) {
+export default function TickerSearch({
+  value,
+  onChange,
+  onSearch,
+  submitLabel = 'Buscar',
+  loading = false,
+}) {
   const listId = useId()
   const [open, setOpen] = useState(false)
   const [highlight, setHighlight] = useState(-1) // -1 = nenhuma sugestão destacada
@@ -104,8 +112,8 @@ export default function TickerSearch({ value, onChange, onSearch }) {
           </ul>
         )}
       </div>
-      <Button type="submit" className="px-6">
-        Buscar
+      <Button type="submit" className="px-6" loading={loading}>
+        {submitLabel}
       </Button>
     </form>
   )

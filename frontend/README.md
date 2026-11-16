@@ -58,6 +58,7 @@ src/
 ├── pages/
 │   ├── Login.jsx, Register.jsx
 │   ├── Dashboard.jsx        # busca + card + gráfico + "criar alerta"
+│   ├── Saved.jsx            # tickers salvos (acesso rápido), guardados no localStorage
 │   ├── Alerts.jsx           # lista, filtros, editar, pausar, excluir
 │   ├── Analytics.jsx        # simulação de investimento + análise de variação (API Java)
 │   └── NotFound.jsx

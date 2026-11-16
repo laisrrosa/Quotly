@@ -29,9 +29,12 @@ export default function Layout() {
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-3">
           <div className="flex items-center gap-6">
             <Logo />
-            <nav className="flex gap-1">
+            <nav className="flex flex-wrap gap-1">
               <NavLink to="/dashboard" className={linkClass}>
                 Cotações
+              </NavLink>
+              <NavLink to="/saved" className={linkClass}>
+                Salvos
               </NavLink>
               <NavLink to="/alerts" className={linkClass}>
                 Meus alertas

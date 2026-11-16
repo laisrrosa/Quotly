@@ -6,6 +6,7 @@ import Register from './pages/Register.jsx'
 import Dashboard from './pages/Dashboard.jsx'
 import Alerts from './pages/Alerts.jsx'
 import Analytics from './pages/Analytics.jsx'
+import Saved from './pages/Saved.jsx'
 import NotFound from './pages/NotFound.jsx'
 
 export default function App() {
@@ -21,6 +22,7 @@ export default function App() {
       <Route element={<PrivateRoute />}>
         <Route element={<Layout />}>
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/saved" element={<Saved />} />
           <Route path="/alerts" element={<Alerts />} />
           <Route path="/analytics" element={<Analytics />} />
         </Route>
