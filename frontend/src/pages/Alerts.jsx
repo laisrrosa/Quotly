@@ -241,6 +241,7 @@ export default function Alerts() {
             onSubmit={handleSubmit}
             onCancel={() => setModal(null)}
             submitLabel={modal.mode === 'edit' ? 'Salvar' : 'Criar alerta'}
+            lockTicker={modal.mode === 'edit'}
           />
         )}
       </Modal>

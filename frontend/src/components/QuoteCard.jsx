@@ -1,4 +1,4 @@
-import { formatCompact, formatDateTime, formatMoney, formatPercent } from '../utils/format.js'
+import { formatDateTime, formatMoney, formatPercent } from '../utils/format.js'
 import { Skeleton } from './Spinner.jsx'
 
 function Stat({ label, value }) {
@@ -11,7 +11,9 @@ function Stat({ label, value }) {
 }
 
 export default function QuoteCard({ quote, action }) {
-  const up = quote.change >= 0
+  // a API real pode não informar a variação (change fica null)
+  const hasChange = quote.change != null
+  const up = !hasChange || quote.change >= 0
   const color = up ? 'text-up bg-up/10' : 'text-down bg-down/10'
 
   return (
@@ -24,7 +26,7 @@ export default function QuoteCard({ quote, action }) {
               {quote.currency}
             </span>
           </div>
-          <p className="text-sm text-slate-500">{quote.name}</p>
+          {quote.name && <p className="text-sm text-slate-500">{quote.name}</p>}
         </div>
         {action}
       </div>
@@ -33,17 +35,19 @@ export default function QuoteCard({ quote, action }) {
         <span className="font-mono text-4xl font-semibold">
           {formatMoney(quote.price, quote.currency)}
         </span>
-        <span className={`rounded-md px-2 py-1 font-mono text-sm font-semibold ${color}`}>
-          {up ? '▲' : '▼'} {formatMoney(Math.abs(quote.change), quote.currency)} (
-          {formatPercent(quote.changePercent)})
-        </span>
+        {hasChange && (
+          <span className={`rounded-md px-2 py-1 font-mono text-sm font-semibold ${color}`}>
+            {up ? '▲' : '▼'} {formatMoney(Math.abs(quote.change), quote.currency)} (
+            {formatPercent(quote.changePercent)})
+          </span>
+        )}
       </div>
 
       <dl className="mt-6 grid grid-cols-2 gap-4 border-t border-slate-100 pt-4 sm:grid-cols-4">
         <Stat label="Fech. anterior" value={formatMoney(quote.previousClose, quote.currency)} />
+        <Stat label="Abertura" value={formatMoney(quote.open, quote.currency)} />
         <Stat label="Máxima do dia" value={formatMoney(quote.high, quote.currency)} />
         <Stat label="Mínima do dia" value={formatMoney(quote.low, quote.currency)} />
-        <Stat label="Volume" value={formatCompact(quote.volume)} />
       </dl>
 
       <p className="mt-4 text-xs text-slate-400">Atualizado em {formatDateTime(quote.updatedAt)}</p>

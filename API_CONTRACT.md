@@ -1,5 +1,9 @@
 # Quotly: contrato da API (front-end ↔ back-end)
 
+> ⚠️ **Atenção:** este documento é a proposta inicial do front-end e **não** descreve a API que foi implementada.
+> O front-end foi adaptado ao back-end real (rotas `/api/stocks`, login por formulário, `snake_case`, `is_active`/`is_triggered`).
+> A conversão entre os dois formatos está em `frontend/src/services/adapters.js`. A referência da API real é o Swagger em `http://localhost:8000/docs`.
+>
 > **Proposta do front-end (Integrante 3).** Integrantes 1 e 2: revisem e ajustem o que for preciso.
 > Toda mudança aqui precisa ser avisada, porque o front-end depende exatamente destes nomes de campos.
 

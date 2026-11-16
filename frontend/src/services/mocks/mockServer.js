@@ -1,7 +1,8 @@
 /**
  * "Back-end falso" que roda no navegador.
- * Devolve exatamente o mesmo formato combinado no API_CONTRACT.md,
- * para que trocar para a API real seja só mudar VITE_USE_MOCK=false.
+ * Devolve o mesmo formato que as telas usam (o da API real depois de passar
+ * por services/adapters.js), então trocar para a API real é só mudar
+ * VITE_USE_MOCK=false.
  *
  * Usuários e alertas ficam salvos no localStorage do navegador.
  */
@@ -166,9 +167,9 @@ export async function getQuote(rawTicker) {
     change: Number(change.toFixed(2)),
     changePercent: Number(((change / prev.close) * 100).toFixed(2)),
     previousClose: prev.close,
+    open: Number((prev.close * (1 + (last._r - 0.5) * 0.01)).toFixed(2)),
     high: Number((Math.max(last.close, prev.close) * (1 + last._r * 0.012)).toFixed(2)),
     low: Number((Math.min(last.close, prev.close) * (1 - last._r * 0.012)).toFixed(2)),
-    volume: Math.round(2_000_000 + last._r * 40_000_000),
     updatedAt: new Date().toISOString(),
   }
 }
