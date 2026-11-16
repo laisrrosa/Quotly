@@ -10,7 +10,7 @@ function Stat({ label, value }) {
   )
 }
 
-export default function QuoteCard({ quote, action }) {
+export default function QuoteCard({ quote, action, autoRefresh = false }) {
   // se a variação não vier, o selo de alta/baixa não aparece
   const hasChange = quote.change != null
   const up = !hasChange || quote.change >= 0
@@ -50,7 +50,10 @@ export default function QuoteCard({ quote, action }) {
         <Stat label="Volume" value={formatCompact(quote.volume)} />
       </dl>
 
-      <p className="mt-4 text-xs text-slate-400">Atualizado em {formatDateTime(quote.updatedAt)}</p>
+      <p className="mt-4 text-xs text-slate-400">
+        Atualizado em {formatDateTime(quote.updatedAt)}
+        {autoRefresh && ' · atualiza sozinho a cada minuto'}
+      </p>
     </section>
   )
 }
