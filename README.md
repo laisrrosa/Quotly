@@ -26,7 +26,7 @@ O **Quotly** é uma plataforma web que integra duas APIs independentes (**Python
 Quotly/
 ├── api-python/    # API REST em Python (FastAPI) - Porta 8000
 ├── api-java/      # API REST em Java (Spring Boot) - Porta 8085
-├── frontend/      # Interface Web (a ser integrada)
+├── frontend/      # Interface Web (React + Vite) - Porta 5173
 └── README.md
 ```
 
@@ -81,6 +81,20 @@ cd api-java
 
 ---
 
+### 3. Front-end (`frontend/` — Porta `5173`)
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+No arquivo `frontend/.env`, `VITE_USE_MOCK=true` usa dados simulados e `VITE_USE_MOCK=false` usa as duas APIs reais. Detalhes em `frontend/README.md`.
+
+- Interface disponível em: `http://localhost:5173`
+
+---
+
 ## 📡 Lista de Endpoints
 
 ### API Python (`http://localhost:8000`)
@@ -97,6 +111,8 @@ cd api-java
 | `POST` | `/api/stocks/` | Registro de cotação no histórico |
 | `GET` | `/api/stocks/{ticker}` | Cotação mais recente de um ativo |
 | `GET` | `/api/stocks/{ticker}/history` | Histórico de cotações para gráficos |
+| `GET` | `/api/quotes/{ticker}` | Cotação atual de qualquer ativo, direto do mercado (autenticado) |
+| `GET` | `/api/quotes/{ticker}/history` | Histórico diário de fechamentos (`range=7d\|1mo\|6mo\|1y`, autenticado) |
 
 ### API Java (`http://localhost:8085`)
 | Método | Endpoint | Descrição |

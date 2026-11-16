@@ -20,15 +20,16 @@ No `.env`:
 | Variável | Valor | Efeito |
 |---|---|---|
 | `VITE_USE_MOCK` | `true` | Usa o "back-end falso" em `src/services/mocks/mockServer.js`. Não precisa do back-end. Usuários e alertas ficam no localStorage. |
-| `VITE_USE_MOCK` | `false` | Chama a API real em `VITE_API_URL`. |
-| `VITE_API_URL` | `http://localhost:8000` | Endereço do back-end. |
+| `VITE_USE_MOCK` | `false` | Chama as APIs reais em `VITE_API_URL` e `VITE_ANALYTICS_URL`. |
+| `VITE_API_URL` | `http://localhost:8000` | Endereço da API Python (login, alertas, cotações). |
+| `VITE_ANALYTICS_URL` | `http://localhost:8085` | Endereço da API Java (simulação e análise de variação). |
 
 Depois de mudar o `.env`, reinicie o `npm run dev`.
 
 No modo mock dá para buscar: PETR4, VALE3, ITUB4, BBDC4, BBAS3, WEGE3, MGLU3, ABEV3, AAPL, MSFT, TSLA, NVDA.
 Qualquer outro código retorna "não encontrado", para testar o tratamento de erro.
 
-O formato de cada endpoint está em [`../API_CONTRACT.md`](../API_CONTRACT.md).
+As cotações usam `/api/quotes` (formato em [`../API_CONTRACT.md`](../API_CONTRACT.md)). Login e alertas usam o formato do back-end, convertido em `src/services/adapters.js`.
 
 ## Estrutura
 
@@ -42,8 +43,10 @@ src/
 ├── services/
 │   ├── api.js               # axios, interceptor JWT, logout no 401, getErrorMessage()
 │   ├── auth.js              # register / login / me
-│   ├── quotes.js            # cotação + histórico
+│   ├── quotes.js            # cotação + histórico (/api/quotes)
 │   ├── alerts.js            # CRUD de alertas
+│   ├── adapters.js          # converte os alertas entre o formato da API e o das telas
+│   ├── analytics.js         # API Java: simulação e análise de variação
 │   └── mocks/mockServer.js  # back-end falso (mesmo formato da API real)
 ├── components/
 │   ├── Layout.jsx           # navbar + <Outlet/>
@@ -55,7 +58,9 @@ src/
 ├── pages/
 │   ├── Login.jsx, Register.jsx
 │   ├── Dashboard.jsx        # busca + card + gráfico + "criar alerta"
+│   ├── Saved.jsx            # tickers salvos (acesso rápido), guardados no localStorage
 │   ├── Alerts.jsx           # lista, filtros, editar, pausar, excluir
+│   ├── Analytics.jsx        # simulação de investimento + análise de variação (API Java)
 │   └── NotFound.jsx
 └── utils/format.js          # moeda, %, datas em pt-BR
 ```

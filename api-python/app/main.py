@@ -5,6 +5,7 @@ from app.core.config import settings
 from app.routes.auth import router as auth_router
 from app.routes.alerts import router as alerts_router
 from app.routes.stocks import router as stocks_router
+from app.routes.quotes import router as quotes_router
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -32,6 +33,8 @@ app.add_middleware(
 app.include_router(auth_router)
 app.include_router(alerts_router)
 app.include_router(stocks_router)
+# Cotações de qualquer ativo direto do mercado (serviço do Integrante 2)
+app.include_router(quotes_router)
 
 # verificação de integridade
 @app.get("/", tags=["Status"])

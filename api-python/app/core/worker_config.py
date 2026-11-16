@@ -13,7 +13,7 @@ from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
 
-# As variáveis deste módulo ficam em `backend/.env.worker` (e não no `.env` do
+# As variáveis deste módulo ficam em `api-python/.env.worker` (e não no `.env` do
 # back-end): a classe Settings do back-end rejeita variáveis que ela não
 # conhece, então misturar os dois arquivos impediria a API de subir.
 ENV_FILE = Path(__file__).resolve().parents[2] / ".env.worker"

@@ -65,11 +65,14 @@ api.interceptors.response.use(
 /**
  * Extrai uma mensagem amigável de um erro do axios.
  * O FastAPI devolve { detail: "texto" } ou { detail: [{ msg: "..." }] }.
+ * A API Java devolve { message: "texto" }.
  */
 export function getErrorMessage(error, fallback = 'Algo deu errado. Tente novamente.') {
   const detail = error?.response?.data?.detail
   if (typeof detail === 'string') return detail
   if (Array.isArray(detail) && detail[0]?.msg) return detail[0].msg
+  const message = error?.response?.data?.message
+  if (typeof message === 'string' && message) return message
   if (error?.code === 'ECONNABORTED') return 'O servidor demorou para responder.'
   if (error?.message === 'Network Error') return 'Não foi possível conectar ao servidor.'
   return fallback

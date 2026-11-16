@@ -6,10 +6,16 @@ import Button from '../components/Button.jsx'
 import Modal from '../components/Modal.jsx'
 import PriceChart from '../components/PriceChart.jsx'
 import QuoteCard, { QuoteCardSkeleton } from '../components/QuoteCard.jsx'
+import TickerSearch from '../components/TickerSearch.jsx'
+import { MAX_SAVED, useSavedTickers } from '../hooks/useSavedTickers.js'
 import { createAlert } from '../services/alerts.js'
 import { getErrorMessage } from '../services/api.js'
 import { getHistory, getQuote, POPULAR_TICKERS } from '../services/quotes.js'
 import { formatMoney } from '../utils/format.js'
+
+// De quanto em quanto tempo a cotação é buscada de novo sozinha.
+// A API guarda cada cotação por 60 s, então atualizar mais rápido não traria preço novo.
+const REFRESH_MS = 60_000
 
 export default function Dashboard() {
   // O ticker fica na URL (?ticker=PETR4), assim dá para recarregar/compartilhar
@@ -26,6 +32,8 @@ export default function Dashboard() {
   const [historyLoading, setHistoryLoading] = useState(false)
 
   const [alertOpen, setAlertOpen] = useState(false)
+
+  const { add: addSaved, remove: removeSaved, isSaved } = useSavedTickers()
 
   // Busca a cotação sempre que o ticker da URL mudar
   useEffect(() => {
@@ -50,6 +58,26 @@ export default function Dashboard() {
     }
   }, [ticker])
 
+  // Atualização automática: busca a cotação de novo a cada minuto, sem piscar a tela.
+  // Não roda com a aba em segundo plano e, se der erro, mantém o último preço.
+  useEffect(() => {
+    if (!ticker) return
+    let cancelled = false
+    const timer = setInterval(() => {
+      if (document.hidden) return
+      getQuote(ticker)
+        .then((q) => {
+          // só troca se já havia uma cotação na tela (não mexe em telas de erro/carregando)
+          if (!cancelled) setQuote((current) => (current ? q : current))
+        })
+        .catch(() => {})
+    }, REFRESH_MS)
+    return () => {
+      cancelled = true
+      clearInterval(timer)
+    }
+  }, [ticker])
+
   // Busca o histórico quando o ticker ou o período mudarem
   useEffect(() => {
     if (!ticker) return
@@ -71,6 +99,24 @@ export default function Dashboard() {
     setSearchParams({ ticker: t })
   }
 
+  // Botão "Salvar" do card: põe ou tira o ativo da lista de tickers salvos
+  function toggleSaved(t) {
+    if (isSaved(t)) {
+      removeSaved(t)
+      toast.success(`${t} removido dos salvos.`)
+      return
+    }
+    if (addSaved(t) === 'full') {
+      toast.error(`Você pode salvar no máximo ${MAX_SAVED} tickers.`)
+      return
+    }
+    toast.success(
+      <span>
+        {t} salvo! <Link to="/saved" className="font-medium underline">Ver salvos</Link>
+      </span>,
+    )
+  }
+
   async function handleCreateAlert(payload) {
     try {
       await createAlert(payload)
@@ -89,27 +135,12 @@ export default function Dashboard() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold">Consultar cotação</h1>
-        <p className="text-sm text-slate-500">Digite o código de uma ação da B3 ou dos EUA.</p>
+        <p className="text-sm text-slate-500">
+          Digite o código ou o nome de uma ação da B3 ou dos EUA.
+        </p>
       </div>
 
-      <form
-        onSubmit={(e) => {
-          e.preventDefault()
-          search(input)
-        }}
-        className="flex gap-2"
-      >
-        <input
-          value={input}
-          onChange={(e) => setInput(e.target.value.toUpperCase())}
-          placeholder="Ex: PETR4, VALE3, AAPL"
-          aria-label="Código da ação"
-          className="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 font-mono uppercase outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
-        />
-        <Button type="submit" className="px-6">
-          Buscar
-        </Button>
-      </form>
+      <TickerSearch value={input} onChange={setInput} onSearch={search} />
 
       <div className="flex flex-wrap items-center gap-2 text-sm">
         <span className="text-slate-500">Populares:</span>
@@ -142,7 +173,25 @@ export default function Dashboard() {
         <>
           <QuoteCard
             quote={quote}
-            action={<Button onClick={() => setAlertOpen(true)}>🔔 Criar alerta</Button>}
+            autoRefresh
+            action={
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  variant="secondary"
+                  aria-pressed={isSaved(quote.ticker)}
+                  onClick={() => toggleSaved(quote.ticker)}
+                >
+                  {isSaved(quote.ticker) ? '★ Salvo' : '☆ Salvar'}
+                </Button>
+                <Link
+                  to={`/analytics?ticker=${encodeURIComponent(quote.ticker)}`}
+                  className="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50"
+                >
+                  📊 Analisar
+                </Link>
+                <Button onClick={() => setAlertOpen(true)}>🔔 Criar alerta</Button>
+              </div>
+            }
           />
           <PriceChart
             data={history}

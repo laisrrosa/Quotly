@@ -1,8 +1,7 @@
 /**
  * "Back-end falso" que roda no navegador.
- * Devolve o mesmo formato que as telas usam (o da API real depois de passar
- * por services/adapters.js), então trocar para a API real é só mudar
- * VITE_USE_MOCK=false.
+ * Devolve o mesmo formato que as telas usam, então trocar para as APIs reais
+ * é só mudar VITE_USE_MOCK=false.
  *
  * Usuários e alertas ficam salvos no localStorage do navegador.
  */
@@ -167,9 +166,9 @@ export async function getQuote(rawTicker) {
     change: Number(change.toFixed(2)),
     changePercent: Number(((change / prev.close) * 100).toFixed(2)),
     previousClose: prev.close,
-    open: Number((prev.close * (1 + (last._r - 0.5) * 0.01)).toFixed(2)),
     high: Number((Math.max(last.close, prev.close) * (1 + last._r * 0.012)).toFixed(2)),
     low: Number((Math.min(last.close, prev.close) * (1 - last._r * 0.012)).toFixed(2)),
+    volume: Math.round(2_000_000 + last._r * 40_000_000),
     updatedAt: new Date().toISOString(),
   }
 }
@@ -268,4 +267,56 @@ export async function deleteAlert(token, id) {
   const next = all.filter((a) => !(a.id === id && a.userId === user.id))
   if (next.length === all.length) throw httpError(404, 'Alerta não encontrado.')
   save(ALERTS_KEY, next)
+}
+
+// ---------- análises (mesmas contas da API Java) ----------
+
+const round2 = (n) => Math.round(n * 100) / 100
+
+export async function simulate({
+  ticker,
+  initialAmount,
+  monthlyContribution,
+  months,
+  annualRatePercent,
+}) {
+  await wait()
+  // taxa anual -> taxa mensal equivalente (juros compostos)
+  const monthlyRate = Math.pow(1 + annualRatePercent / 100, 1 / 12) - 1
+  let balance = initialAmount
+  let invested = initialAmount
+  for (let i = 1; i <= months; i++) {
+    balance = balance * (1 + monthlyRate) + monthlyContribution
+    invested += monthlyContribution
+  }
+  const finalBalance = round2(balance)
+  const totalInvested = round2(invested)
+  return {
+    ticker: normalizeTicker(ticker),
+    initialAmount,
+    monthlyContribution,
+    months,
+    annualRatePercent,
+    totalInvested,
+    totalInterest: round2(finalBalance - totalInvested),
+    finalBalance,
+  }
+}
+
+export async function variation({ ticker, currentPrice, previousClose, targetPrice }) {
+  await wait()
+  const absoluteChange = round2(currentPrice - previousClose)
+  let trend = 'NEUTRAL'
+  if (absoluteChange > 0) trend = 'UP'
+  else if (absoluteChange < 0) trend = 'DOWN'
+  return {
+    ticker: normalizeTicker(ticker),
+    currentPrice: round2(currentPrice),
+    previousClose: round2(previousClose),
+    absoluteChange,
+    percentageChange: round2(((currentPrice - previousClose) / previousClose) * 100),
+    trend,
+    distanceToTargetPercent:
+      targetPrice != null ? round2(((targetPrice - currentPrice) / currentPrice) * 100) : null,
+  }
 }

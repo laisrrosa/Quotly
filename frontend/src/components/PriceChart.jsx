@@ -31,8 +31,8 @@ export default function PriceChart({ data, range, onRangeChange, loading, curren
   const color = up ? 'var(--color-up)' : 'var(--color-down)'
   const longRange = range === '6mo' || range === '1y'
 
-  // A API real devolve um ponto por coleta do worker (com hora), não um por pregão.
-  // Se todos os pontos couberem em menos de 2 dias, o eixo mostra a hora.
+  // /api/quotes devolve um ponto por pregão ("AAAA-MM-DD"). Se algum dia os pontos
+  // vierem com hora e couberem em menos de 2 dias, o eixo passa a mostrar a hora.
   const hasTime = data.length > 0 && data[0].date.length > 10
   const spanMs =
     hasTime && data.length > 1 ? new Date(data[data.length - 1].date) - new Date(data[0].date) : 0
