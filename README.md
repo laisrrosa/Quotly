@@ -4,14 +4,6 @@ Projeto final da disciplina **Laboratório de Programação II**.
 
 O **Quotly** é uma plataforma web para consultar cotações de ações, criar alertas de preço (com aviso por e-mail) e fazer simulações financeiras. Ele é formado por duas APIs independentes, uma em **Python (FastAPI)** e outra em **Java (Spring Boot)**, consumidas por um **front-end em React**.
 
-## Integrantes do grupo
-
-| Integrante | Responsabilidade |
-|---|---|
-| Edson Henrique | Back-end core, banco de dados e API Java |
-| Luiz Filipe | Serviço de cotações, worker de alertas e envio de e-mails |
-| Laís Rodrigues da Rosa | Front-end web |
-
 ## Visão geral
 
 | Parte | Pasta | Tecnologia | Endereço |
