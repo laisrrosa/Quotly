@@ -144,7 +144,7 @@ Ficam em `api-python/.env.worker`. Depois de alterar, reinicie a API Python e o 
 | `EMAIL_BACKEND=smtp` + `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD` | Envia os e-mails de alerta de verdade (por exemplo, com uma caixa de testes do Mailtrap ou uma senha de app do Gmail). |
 | `ALERT_CHECK_INTERVAL_MINUTES` | Intervalo de verificação dos alertas (padrão: 5 minutos). |
 
-Mais detalhes sobre o worker em [`api-python/README_WORKER.md`](api-python/README_WORKER.md) e sobre o front-end em [`frontend/README.md`](frontend/README.md).
+Mais detalhes sobre o worker em [`api-python/README_WORKER.md`](api-python/README_WORKER.md).
 
 ## Testes automatizados
 

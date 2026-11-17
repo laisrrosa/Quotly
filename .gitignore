@@ -11,6 +11,8 @@ __pycache__/
 build/
 .gradle/
 target/
+# saída de compilação das IDEs (VS Code / Eclipse)
+api-java/bin/
 *.jar
 !gradle-wrapper.jar
 *.war
